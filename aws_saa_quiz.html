@@ -1,0 +1,539 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--aws-orange:#FF9900;--aws-dark:#232F3E;--correct:#27a060;--wrong:#c0392b;
+--bg:var(--color-background-primary);--bg2:var(--color-background-secondary);
+--border:var(--color-border-tertiary);--text:var(--color-text-primary);--text2:var(--color-text-secondary);
+}
+body{font-family:var(--font-sans);background:var(--bg)}
+#app{max-width:480px;margin:0 auto;padding:0 0 80px}
+
+.header{background:var(--aws-dark);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.header-logo{font-size:20px;font-weight:700;color:var(--aws-orange);letter-spacing:-.5px}
+.header-title{font-size:13px;color:rgba(255,255,255,.7);margin-top:1px}
+
+.progress-bar-wrap{background:rgba(255,255,255,.15);height:3px;margin:10px 0 0;border-radius:2px}
+.progress-bar{height:3px;background:var(--aws-orange);border-radius:2px;transition:width .4s}
+
+.screen{padding:16px}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border-radius:12px;padding:14px;text-align:center}
+.stat-num{font-size:26px;font-weight:700;color:var(--text)}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.stat-num.orange{color:var(--aws-orange)}
+.stat-num.green{color:var(--correct)}
+.stat-num.red{color:var(--wrong)}
+
+.section-title{font-size:13px;font-weight:500;color:var(--text2);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+
+.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mode-btn{background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s}
+.mode-btn:hover{border-color:var(--aws-orange)}
+.mode-btn.active{border:2px solid var(--aws-orange);background:rgba(255,153,0,.06)}
+.mode-icon{font-size:22px;margin-bottom:4px}
+.mode-name{font-size:13px;font-weight:500;color:var(--text)}
+.mode-desc{font-size:11px;color:var(--text2);margin-top:2px}
+
+.start-btn{width:100%;padding:15px;background:var(--aws-orange);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity .2s}
+.start-btn:hover{opacity:.9}
+.start-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.weak-list{display:flex;flex-direction:column;gap:8px}
+.weak-item{background:var(--bg2);border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px}
+.weak-icon{font-size:18px}
+.weak-info{flex:1}
+.weak-name{font-size:13px;font-weight:500;color:var(--text)}
+.weak-rate{font-size:11px;color:var(--wrong);margin-top:1px}
+.weak-bar-wrap{background:var(--border);height:4px;border-radius:2px;margin-top:4px}
+.weak-bar{height:4px;border-radius:2px;background:var(--wrong)}
+
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.q-num{font-size:12px;color:var(--text2)}
+.q-badge{font-size:11px;background:rgba(255,153,0,.15);color:var(--aws-orange);padding:3px 8px;border-radius:20px;border:0.5px solid rgba(255,153,0,.3)}
+
+.question-card{background:var(--bg);border:0.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+.question-tag{font-size:11px;color:var(--aws-orange);font-weight:500;margin-bottom:8px}
+.question-text{font-size:15px;line-height:1.7;color:var(--text)}
+.multi-hint{font-size:11px;color:var(--text2);margin-top:6px;font-style:italic}
+
+.options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.option{display:flex;align-items:flex-start;gap:12px;padding:13px;border:0.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.option:hover:not(.disabled){border-color:var(--aws-orange);background:rgba(255,153,0,.05)}
+.option.selected{border-color:var(--aws-orange);background:rgba(255,153,0,.08)}
+.option.correct{border-color:var(--correct)!important;background:rgba(39,160,96,.08)!important}
+.option.wrong{border-color:var(--wrong)!important;background:rgba(192,57,43,.08)!important}
+.option.disabled{cursor:default}
+.option-letter{width:26px;height:26px;min-width:26px;border-radius:50%;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--text2);flex-shrink:0;transition:all .15s}
+.option.selected .option-letter{background:var(--aws-orange);border-color:var(--aws-orange);color:#fff}
+.option.correct .option-letter{background:var(--correct);border-color:var(--correct);color:#fff}
+.option.wrong .option-letter{background:var(--wrong);border-color:var(--wrong);color:#fff}
+.option-text{font-size:14px;line-height:1.6;color:var(--text);padding-top:3px}
+
+.explanation{background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:12px;border-left:3px solid var(--aws-orange)}
+.explanation h4{font-size:12px;font-weight:500;color:var(--aws-orange);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.explanation p{font-size:13px;line-height:1.7;color:var(--text)}
+
+.nav-btns{display:flex;gap:10px}
+.nav-btn{flex:1;padding:13px;border:0.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text);transition:all .2s}
+.nav-btn:hover{border-color:var(--aws-orange);color:var(--aws-orange)}
+.nav-btn.primary{background:var(--aws-orange);color:#fff;border-color:var(--aws-orange)}
+.nav-btn.primary:hover{opacity:.9}
+
+.result-header{text-align:center;padding:24px 0 16px}
+.result-icon{font-size:48px;margin-bottom:8px}
+.result-score{font-size:42px;font-weight:700;color:var(--aws-orange)}
+.result-total{font-size:16px;color:var(--text2)}
+.result-msg{font-size:14px;color:var(--text2);margin-top:6px}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);display:flex;z-index:20}
+.nav-tab{flex:1;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--text2);transition:color .2s}
+.nav-tab.active{color:var(--aws-orange)}
+.nav-tab-icon{font-size:20px}
+.nav-tab-label{font-size:10px}
+
+.empty{text-align:center;padding:30px 0;color:var(--text2);font-size:14px}
+.spinner{text-align:center;padding:40px;color:var(--text2)}
+
+.confirm-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px}
+.confirm-btn.active{background:var(--aws-orange);color:#fff}
+.confirm-btn.inactive{background:var(--bg2);color:var(--text2);cursor:not-allowed}
+</style>
+
+<div id="app">
+  <div class="header">
+    <div>
+      <div class="header-logo">AWS SAA-C03</div>
+      <div class="header-title">Solutions Architect Associate 模擬問題</div>
+    </div>
+    <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.5)" id="header-count"></div>
+  </div>
+  <div id="root"><div class="spinner"><i class="ti ti-refresh" style="font-size:24px"></i><br>読み込み中…</div></div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-tab active" id="tab-home" onclick="showTab('home')">
+    <i class="ti ti-home nav-tab-icon" aria-hidden="true"></i>
+    <span class="nav-tab-label">ホーム</span>
+  </div>
+  <div class="nav-tab" id="tab-quiz" onclick="showTab('quiz')">
+    <i class="ti ti-pencil nav-tab-icon" aria-hidden="true"></i>
+    <span class="nav-tab-label">クイズ</span>
+  </div>
+  <div class="nav-tab" id="tab-history" onclick="showTab('history')">
+    <i class="ti ti-chart-bar nav-tab-icon" aria-hidden="true"></i>
+    <span class="nav-tab-label">分析</span>
+  </div>
+  <div class="nav-tab" id="tab-settings" onclick="showTab('settings')">
+    <i class="ti ti-settings nav-tab-icon" aria-hidden="true"></i>
+    <span class="nav-tab-label">設定</span>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+{id:1,category:"ストレージ",text:"ある企業では、企業内で共有するファイルサーバーとしてWindowsサーバーを使用しています。SMBプロトコルを使用してWindowsフォルダ共有や、複数のWindowsサーバー間での複製（DFSレプリケーション）を実現しています。移行先として適切なAWSサービスはどれですか。",options:["Amazon EFS","Amazon S3","Amazon FSx for Windows","Amazon EBS","Amazon FSx for Lustre"],answers:[2],multi:false,explanation:"Amazon FSx for WindowsはSMBプロトコル対応の完全マネージド型ファイルストレージです。DFSレプリケーションやActive Directory統合などWindows Server標準機能を提供します。EFSはNFSのみ、S3はオブジェクトストレージ、EBSはブロックストレージです。"},
+{id:2,category:"アーキテクチャ",text:"WebアプリケーションをAmazon ECSに移行しマイクロサービス化する際、フロントエンドとバックエンド処理の連携に適切なソリューションはどれですか。",options:["Amazon SQSを使用し、SQSキューからデータを取り出す","Amazon SNSを使用し、データをトピック通知する","Amazon S3を使用し、S3バケットに登録されたデータをトリガーとする","Amazon EFSを使用し、データを共有する"],answers:[0],multi:false,explanation:"SQSはキューイングにより大量処理・時間のかかる処理でもフロントエンドからの依頼を溜め、バックエンドへ連携・並列化できます。SNSは通知用途でマイクロサービス連携には不適、S3はオブジェクトストレージ、EFSはファイル共有です。"},
+{id:3,category:"データベース",text:"Amazon RDS for MySQLで大量のデータ追加・更新によりストレージパフォーマンスが問題となっています。適切な対応はどれですか。",options:["RDSリードレプリカを構築してアプリケーションの参照先を変更する","ストレージタイプをスループット最適化HDD（st1）に変更する","DBインスタンスをメモリ最適化インスタンスクラスに変更する","ストレージタイプをプロビジョンドIOPS SSD（io1）に変更する"],answers:[3],multi:false,explanation:"プロビジョンドIOPS SSD（io1）は最もパフォーマンスが高くミッションクリティカルなDBに適します。リードレプリカは書き込みには効果なし、st1は高スループットHDDでIOPS性能は低め、インスタンス変更はストレージ問題を解決しません。"},
+{id:4,category:"コンピューティング",text:"Amazon EC2インスタンス間で低いネットワークレイテンシーと高いスループットを実現するソリューションはどれですか。",options:["AWS Auto Scaling","クラスタープレイスメントグループ","パーティションプレイスメントグループ","スプレッドプレイスメントグループ"],answers:[1],multi:false,explanation:"クラスタープレイスメントグループはEC2インスタンスを同一ラックに配置し、インスタンス間通信を高速化します。低レイテンシー・高スループットが必要なHPCアプリケーションに最適です。"},
+{id:5,category:"セキュリティ",text:"Amazon S3を利用した特定の会員向け画像共有サイトで、会員以外のアクセスを防ぐ方法はどれですか（2つ選択）。",options:["有効期限付きの署名付きURLを使用する","WebサーバーのEBSボリュームに写真を保存する","セキュリティグループを利用して会員のIPアドレスのみ許可する","Amazon S3の一般公開用のアクセス権を削除する","バケットポリシーでMFA認証を要求する"],answers:[0,3],multi:true,explanation:"署名付きURLで期限付きアクセスを会員のみに許可できます。S3のパブリックアクセス権を削除することで不特定多数のアクセスを防ぎます。IPアドレス管理は会員の増減に対応困難で現実的ではありません。"},
+{id:6,category:"ネットワーク",text:"VPC内のアプリケーションからAmazon DynamoDBにインターネット経由なしでプライベート接続するサービスはどれですか。",options:["VPCピアリング","AWS Direct Connect","NATゲートウェイ","VPCエンドポイント"],answers:[3],multi:false,explanation:"VPCエンドポイントはS3やDynamoDBへインターネット経由なしでAWS内プライベート接続を実現します。VPCピアリングはVPC間接続、Direct Connectはオンプレミス接続、NATゲートウェイはインターネット経由になります。"},
+{id:7,category:"データベース",text:"頻繁な登録・更新・削除、複数テーブル結合のSQLクエリ、ストレージ自動拡張が必要なデータベースサービスはどれですか。",options:["Amazon DynamoDB","Amazon S3 Glacier","Amazon Aurora","Amazon Redshift","Amazon S3"],answers:[2],multi:false,explanation:"Amazon Auroraはマネージド型RDBで頻繁な更新・削除に対応し、SQLでの複数テーブル結合が可能です。データ量に応じたストレージ自動拡張機能も備えています。DynamoDBはNoSQL、GlacierはアーカイブS3、RedshiftはDWH向けです。"},
+{id:8,category:"アーキテクチャ",text:"ユーザー数が1年で5倍になるアプリケーションに推奨する設計変更はどれですか（2つ選択）。",options:["EC2からS3に静的ファイルを移動する","Amazon Route 53の位置情報ルーティングポリシーを使用する","リアルタイムのCloudTrailログに基づいて環境をスケーリングする","マイクロサービスごとに専用のELBを作成する","RDSリードレプリカを作成してアプリケーションを変更する"],answers:[0,4],multi:true,explanation:"S3への静的ファイル移動でアクセス増加に対応しやすくなります。RDSリードレプリカで読み取りスループットとパフォーマンスを向上できます。CloudTrailはAPIログ収集でスケーリングには使えません。"},
+{id:9,category:"ネットワーク",text:"Zone Apexを使用した静的WebサイトでAmazon Route 53を使うスケーラブルで費用対効果の高い構成はどれですか（2つ選択）。",options:["EC2インスタンス上にWebサイトを構築しRoute 53のエイリアスとしてEC2のパブリックIPを紐付ける","CloudFormationを使用してWebサイトを構築しRoute 53のエイリアスとしてCloudFormationスタックを紐付ける","Amazon S3上のコンテンツを静的Webサイトホスティングで公開しRoute 53のエイリアスとしてS3のエンドポイントを紐付ける","ELBとAuto ScalingでEC2上にWebサイトを構築しRoute 53のエイリアスとしてELBのエンドポイントを紐付ける"],answers:[2,3],multi:true,explanation:"Route 53のエイリアスはELB、CloudFront、S3に対してZone Apexレコードを設定できます。S3静的ホスティング+Route 53、またはELB+AutoScaling+Route 53の組み合わせが費用対効果高いスケーラブル構成です。"},
+{id:10,category:"高可用性",text:"単一AZの2層Webアプリケーションで高可用性を実現する方法はどれですか（2つ選択）。",options:["同じAZに新しいパブリックサブネットとプライベートサブネットを作成する","複数のAZにまたがるEC2のAuto ScalingグループとALBを作成する","既存のWebアプリケーションインスタンスをALBのAuto Scalingグループに追加する","別のAZに新しいサブネットを作成し単一AZのEC2にデータベースを構築する","別のAZに新しいサブネットを作成しデータベースをRDSのマルチAZ配置に移行する"],answers:[1,4],multi:true,explanation:"複数AZにまたがるAuto Scaling+ALBで地理的冗長化を実現。RDSのマルチAZ配置でDBの高可用性も確保できます。同じAZではAZ障害に対応できません。"},
+{id:11,category:"コスト最適化",text:"画像ファイルをRDSからAWSへ移行しコスト削減とパフォーマンス向上を図る最適な方法はどれですか。",options:["Amazon RDSのMySQLデータベースのリードレプリカを利用する","頻繁に使用される1割のみRDSに格納し残りをS3 Glacierに移行する","画像ファイルをすべてAmazon EBSに移行しCloudFrontを介してアクセスさせる","画像ファイルをすべてAmazon S3に移行しCloudFrontを介してアクセスさせる"],answers:[3],multi:false,explanation:"S3に画像を移行することでコスト削減が見込め、CloudFrontと組み合わせることで高速配信が可能です。RDSは画像ストレージには不向き、EBSはEC2に紐付くためCDN配信に不適です。"},
+{id:12,category:"移行",text:"50TB×複数アプリのAWS移行（1カ月以内）と移行後の安全で安定したネットワーク接続の組み合わせはどれですか。",options:["初回のデータ移行および継続的なネットワークにAWS Direct Connectを利用する","初回のデータ移行および継続的なネットワークにSite to Site VPNを利用する","初回のデータ移行にAWS Snowball、継続的なネットワークにAWS Direct Connectを利用する","初回のデータ移行にAWS Snowball、継続的なネットワークにSite to Site VPNを利用する"],answers:[2],multi:false,explanation:"大量データの短期移行にはAWS Snowball（物理デバイス）が最適です。移行後の安全で安定したスループットはAWS Direct Connect（専用線）で実現します。Direct ConnectやVPNのみでは1ヶ月以内の移行が困難です。"},
+{id:13,category:"高可用性",text:"2AZで最低4台のEC2が必要なシステムで、1AZ障害時に低コストでSLAを維持するには？",options:["クールダウン期間が短いスケーリングポリシーを追加する","Auto Scalingグループの起動設定をより大きなインスタンスタイプに変更する","Auto Scalingグループを変更して3つのAZで合計6台のEC2インスタンスを使用する","Auto Scalingグループを変更して2つのAZで合計8台のEC2インスタンスを使用する"],answers:[2],multi:false,explanation:"3AZで6台なら1AZあたり2台。1AZ障害時に残り2AZで4台が稼働しSLAを維持できます。2AZで8台は通常時のコストが高くなります。クールダウンやインスタンスタイプ変更はSLA維持に関係しません。"},
+{id:14,category:"セキュリティ",text:"EC2インスタンスからDynamoDBに書き込む際、アクセスキーをEC2に格納せずに実現する方法はどれですか（2つ選択）。",options:["DynamoDBへの書き込みを可能にするIAMロールを作成する","DynamoDBへの書き込みはIAMロールの権限がなくても可能","実行中のEC2インスタンスにIAMユーザーを追加する","Auto Scalingの起動設定にIAMロールが含まれているEC2インスタンスを起動する"],answers:[0,3],multi:true,explanation:"IAMロールをEC2にアタッチすることでアクセスキーなしにDynamoDB書き込みが可能です。Auto Scalingの場合は起動設定にIAMロールを設定します。IAMユーザーをEC2に追加する機能はありません。"},
+{id:15,category:"分析",text:"Webサイトのアクセスログをほぼリアルタイムで収集しSQLクエリでリアルタイム分析する最適なソリューションはどれですか。",options:["SNSを使用しLambdaに連携してSQLクエリを実行する","SQSを使用し現在のEC2インスタンスにデータを連携する","Kinesis Data Streamsで収集しKinesis FirehoseでS3に保存しAthenaでSQL分析する","Kinesis Data Streamsで収集しKinesis Data AnalyticsでSQL分析しFirehoseでS3に保存する"],answers:[3],multi:false,explanation:"Kinesis Data Streams→Kinesis Data Analytics（リアルタイムSQL分析）→Kinesis Firehose（S3保存）の組み合わせが要件に最適です。Athenaはリアルタイム分析には不向きです。"},
+{id:16,category:"コンテンツ配信",text:"世界中の会員への動画配信で、地域に関わらずアクセスから再生までの時間を短縮する最適な方法はどれですか。",options:["Amazon S3に動画ファイルを格納しURLに直接アクセスさせる","Amazon S3に動画ファイルを格納し署名付きURLを利用する","EC2インスタンス上でWebサーバーを起動し動画ファイルをEBSに格納する","Amazon CloudFrontの署名付きURLを利用する"],answers:[3],multi:false,explanation:"CloudFrontはグローバルなエッジロケーションからコンテンツを配信するCDNで、地域に関わらず低レイテンシーを実現します。署名付きURLで認証済みユーザーのみアクセス許可も可能です。"},
+{id:17,category:"データベース",text:"Amazon RDSのMySQLデータベースがボトルネックにならないための効果的な方法はどれですか（2つ選択）。",options:["ELBのClassic Load BalancerをWebアプリケーション層の前に配置する","Amazon RDSのリードレプリカを利用する","Amazon RDSのMySQLの前にAmazon ElastiCacheを配置する","Amazon RDSのMySQLのマルチAZ機能を利用する"],answers:[1,2],multi:true,explanation:"リードレプリカで読み取りスループット向上、ElastiCacheでDBへのアクセスをキャッシュしDB負荷を軽減できます。マルチAZは高可用性向上でボトルネック解消にはなりません。"},
+{id:18,category:"データベース",text:"Amazon Auroraの特徴として誤っている説明はどれですか。",options:["マネージド型のサービスである","MySQLやPostgreSQLよりもスループットが高い","3つのアベイラビリティーゾーンにデータが格納されるため耐久性が高い","列指向のアーキテクチャで大量データの集計・分析に向いている","リレーショナルデータベースサービスである"],answers:[3],multi:false,explanation:"Auroraは行指向のRDBです。列指向で大量データ集計・分析に特化しているのはAmazon Redshiftです。AuroraはMySQLの5倍、PostgreSQLの3倍のスループットを実現し、3AZにデータを格納します。"},
+{id:19,category:"データベース",text:"Amazon Redshiftのクラスターの冗長性を高めるための適切な方法はどれですか。",options:["より性能の高いインスタンスタイプに変更する","クロスリージョンスナップショットを設定する","Redshift Data Sharingで別のクラスターにデータを共有する","ノード数を増やす"],answers:[3],multi:false,explanation:"ノード数を増やすと複数のデータベースがクラスター化され耐障害性が高まります。インスタンスタイプ変更は性能向上、クロスリージョンスナップショットはバックアップ、Data Sharingはデータ共有で冗長性向上ではありません。"},
+{id:20,category:"セキュリティ",text:"Webサーバーが特定のIPアドレスから不正アクセスを受けている場合、このIPアドレスからの接続を拒否するサービスはどれですか。",options:["インターネットゲートウェイ","ネットワークACL","AWS Direct Connect","Amazon API Gateway"],answers:[1],multi:false,explanation:"ネットワークACLはVPC内サブネットに対するファイアウォール機能で、特定IPアドレスからのアクセス拒否が可能です。セキュリティグループは拒否ルールを設定できませんが、ネットワークACLは明示的な拒否ができます。"},
+{id:21,category:"ストレージ",text:"Webサーバーのトラフィックを増やさずに画像ファイルをS3に保存する最も適切な方法はどれですか。",options:["Elastic IPを利用してWebサーバーのIPアドレスを固定化する","一時的S3バケットにアップロード後Lambda関数で移動させる","ELBのClassic Load BalancerでAuto ScalingグループにアップロードしS3に書き込む","画像処理用のスポットインスタンスでWebサーバー機能を拡張する","署名付きURLを使用してS3に直接アップロードする"],answers:[4],multi:false,explanation:"S3の署名付きURLを使うことで、Webサーバーを経由せず直接S3にファイルをアップロードできます。Webサーバーのトラフィック増加を防ぎつつ安全にアップロードが可能です。"},
+{id:22,category:"ネットワーク",text:"プライベートサブネットのデータベースサーバーがソフトウェア更新のためにインターネットにアクセスする方法はどれですか。",options:["パブリックサブネットにNATゲートウェイを構築する","プレイスメントグループを設定する","データベースサーバーにElastic IPを割り当てる","プライベートサブネットのネットワークACLでインターネットからの通信トラフィックを許可に設定する"],answers:[0],multi:false,explanation:"NATゲートウェイをパブリックサブネットに配置することで、プライベートサブネットからインターネットへのアウトバウンド通信を可能にしつつ、インターネットからの直接アクセスを防ぎます。"},
+{id:23,category:"コスト最適化",text:"毎日7時間だけ稼働・高可用性不要・1年後廃止のr4.8xlargeインスタンスのコスト効果が最も高い購入オプションはどれですか。",options:["StandardタイプのリザーブドインスタンスConvertibleタイプのリザーブドインスタンス","Convertibleタイプのリザーブドインスタンス","スケジュールされたリザーブドインスタンス","スポットインスタンス"],answers:[2],multi:false,explanation:"スケジュールされたリザーブドインスタンスは予約した時間枠内で起動できる購入オプションで、毎日7時間の定期稼働に最適です。スポットインスタンスは中断リスクがあり7時間の稼働保証が難しいです。"},
+{id:24,category:"データベース",text:"オンプレミスのリレーショナルDBをAWSに最小限の変更で移行し、障害時の業務継続と高読み取りトラフィックに対応するソリューションはどれですか。",options:["異なるAZのALBに登録されたEC2でホストされたデータベースを構築する","異なるリージョンに複数のEC2インスタンスでホストされたデータベースを構築する","Amazon RDSを使用しマルチAZ配置および1つ以上のリードレプリカで構成する","Amazon RDSを使用しマルチAZ配置および1つ以上のスタンバイデータベースで構成する"],answers:[2],multi:false,explanation:"RDSのマルチAZで耐障害性、リードレプリカで読み取りスループット向上を実現できます。最小限の変更でマネージドサービスに移行でき、RDSにはスタンバイDB機能はありません。"},
+{id:25,category:"コスト最適化",text:"基幹システムと非基幹システムのバッチ処理を低コストで構成する方法はどれですか。",options:["基幹システムをリザーブドインスタンス、非基幹システムをオンデマンドインスタンスで構成する","基幹システムをリザーブドインスタンス、非基幹システムをスポットインスタンスで構成する","基幹システム・非基幹システムともにオンデマンドインスタンスで構成する","基幹システムをスポットインスタンス、非基幹システムをリザーブドインスタンスで構成する"],answers:[1],multi:false,explanation:"基幹システムはリザーブドインスタンス（常時起動保証）、非基幹システムは業務影響がないためスポットインスタンス（最安値）が最適です。"},
+{id:26,category:"移行",text:"ネットワーク帯域15Mbps・使用率70%以下・20TBを30日以内に移行するサービスはどれですか。",options:["AWS Snowball","AWS DataSync","AWS Storage Gatewayのファイルゲートウェイ","Amazon S3 Transfer Acceleration"],answers:[0],multi:false,explanation:"制限されたネットワーク帯域で大量データを期限内に移行するにはAWS Snowball（物理デバイス）が最適です。DataSync、Storage Gateway、S3 Transfer Accelerationはいずれもネットワーク経由のため帯域制限下では困難です。"},
+{id:27,category:"セキュリティ",text:"既存IDプロバイダーで認証済みユーザーを承認し、3回失敗で1時間アクセス拒否するAPI Gateway保護の方法はどれですか。",options:["IAMの認証を使用してIAMロールに最小のアクセス許可を追加する","Amazon API Gatewayカスタム認証を使用してLambda関数を呼び出し各ユーザーのIDを検証する","Cognitoユーザープールを使用し組み込みのユーザー管理を提供する","Cognitoユーザープールを使用し外部IDプロバイダーと統合する"],answers:[1],multi:false,explanation:"API Gatewayカスタム認証はLambdaと連携でき、条件に応じてアクセスを許可・拒否するプログラムを実行できます。Cognitoにはアカウントロック機能はありますが要件に合致しません。IAMだけでは実装困難です。"},
+{id:28,category:"アーキテクチャ",text:"夕方から夜のみ利用者急増、非リレーショナルDBが適切、負荷増減に自動対応が必要なB2Cサービスの最適ソリューションはどれですか。",options:["Route 53を使用しAmazon Auroraでデータ蓄積する","Route 53を使用しAmazon DynamoDBでデータ蓄積する","Network Load Balancerを使用しAmazon Auroraでデータ蓄積する","Network Load Balancerを使用しAmazon DynamoDBでデータ蓄積する"],answers:[3],multi:false,explanation:"NoSQLのDynamoDBがデータ蓄積に適し、負荷分散にはNetwork Load Balancer（低レイテンシー高スループット）が適しています。AuroraはRDBで非RDB要件に合いません。Route 53はDNSフェールオーバー用です。"},
+{id:29,category:"ストレージ",text:"50000 IOPSが必要なAmazon EBSのソリューションとして適切な方法はどれですか。",options:["ボリュームタイプにスループット最適化HDD（st1）を選択する","ボリュームタイプに汎用SSD（gp2）を選択する","ボリュームタイプにプロビジョンドIOPS SSD（io1）を選択しNitro SystemのEC2を作成する","ボリュームタイプにプロビジョンドIOPS SSD（io1）を選択しNitro System以外のEC2を作成する"],answers:[2],multi:false,explanation:"50000 IOPSを超えるにはプロビジョンドIOPS SSD（io1/io2）が必要で、Nitro Systemを選択した場合のみ最大64000 IOPSになります。Nitro System以外では最大32000 IOPSです。"},
+{id:30,category:"分析",text:"大量のストリーミングデータをS3やRedshiftに格納するのに適しているサービスはどれですか。",options:["Amazon Kinesis Data Streams","Amazon Kinesis Data Firehose","Amazon Kinesis Data Analytics","Amazon SQS","Amazon SNS"],answers:[1],multi:false,explanation:"Kinesis Data Firehoseはアプリケーション開発なしにストリームデータをS3、Redshift、OpenSearch Serviceなどに配信・保存できるサービスです。Data Streamsはデータ収集、Data AnalyticsはSQL分析用です。"},
+{id:31,category:"アーキテクチャ",text:"外部サービスへのAPIコールに時間がかかりタイムアウトやレイテンシー増加が起きている場合の対応はどれですか。",options:["EC2インスタンスのサイズを変更しメモリ容量を増やす","Amazon SQSを使用し別々のワーカーによる非同期処理で長時間リクエストをオフロードする","ELBのアイドルタイムアウト時間を増やし長時間実行リクエストを完了できるようにする","Amazon ElastiCache（Redis）を使用し外部サービスからの応答をキャッシュする"],answers:[1],multi:false,explanation:"SQSを使った非同期処理でタイムアウトとレイテンシー増加を解消できます。外部サービスの呼び出しがボトルネックのためEC2サイズアップは無効、キャッシュはオブジェクト作成処理には効果が限定的です。"},
+{id:32,category:"高可用性",text:"EC2インスタンスをオリジンとしたCloudFrontで静的コンテンツを配信するアプリケーションの高可用性実現方法はどれですか。",options:["Amazon CloudFrontにLambda@Edgeを使用する","Amazon CloudFrontにAmazon S3 Transfer Accelerationを有効化する","オリジンの一部として別のAZに別のEC2インスタンスを設定する","同じAZのオリジンサーバークラスターの一部として別のEC2インスタンスを設定する"],answers:[2],multi:false,explanation:"オリジングループに複数AZのEC2を設定することでフェイルオーバーが可能になります。同じAZでは障害時に対応できません。Transfer AccelerationはS3機能でCloudFrontには使えません。"},
+{id:33,category:"データベース",text:"複数リージョンへの分散、書き込み後1秒以内の同期、競合時は最終更新者の内容を反映するデータベースソリューションはどれですか。",options:["Amazon ElastiCacheとRedisを選択する","Amazon Redshiftでコンピュータノード3つ以上のクラスターを構築する","Amazon Auroraでリードレプリカを使用する","Amazon DynamoDBのグローバルテーブルを使用する"],answers:[3],multi:false,explanation:"DynamoDBグローバルテーブルはすべてのテーブルがプライマリで、どのリージョンへの書き込みも1秒以内に他リージョンへ反映され、競合時は最終更新者の内容が採用されます。"},
+{id:34,category:"高可用性",text:"広域災害に備えてEC2アプリケーションを別リージョンでデプロイできるようにする方法はどれですか（2つ選択）。",options:["EC2のEBSボリュームをデタッチしS3にコピーする","別のリージョンのAMIから新しいEC2インスタンスを起動する","別のリージョンでEC2を起動しS3に保管されているEBSにボリュームをコピーする","EC2インスタンスのAMIをコピーし別のリージョンをコピー先に指定する","S3からEBSボリュームをコピーしそのEBSを使用してコピー先リージョンでEC2を起動する"],answers:[1,3],multi:true,explanation:"AMIをコピーする際に宛先リージョンを指定し、そのAMIから新しいEC2を起動します。S3にEBSボリューム自体を保存することはできません（EBSスナップショットを使います）。"},
+{id:35,category:"高可用性",text:"単一AZのEC2でレイヤー4通信のマルチプレーヤーゲームの可用性と費用対効果を向上させる設計変更はどれですか（2つ選択）。",options:["EC2インスタンスの数を増やす","EC2インスタンスの数を減らす","EC2インスタンスの前にNetwork Load Balancerを構成する","EC2インスタンスの前にApplication Load Balancerを構成する","Auto Scalingグループを設定して複数AZのEC2インスタンスを自動追加削除する"],answers:[2,4],multi:true,explanation:"レイヤー4通信にはNetwork Load Balancerが適切です。複数AZへのAuto Scalingで可用性向上と費用対効果改善が見込めます。ALBはレイヤー7向けです。"},
+{id:36,category:"アーキテクチャ",text:"リバースプロキシへのトラフィック増大に対してスケーラブルで費用対効果が高い方法はどれですか（2つ選択）。",options:["リバースプロキシをClassic Load Balancerに置き換える","WebサーバーにAuto Scalingを追加する","リバースプロキシにAuto Scalingを追加する","Webサーバーをバースト可能なt2インスタンスタイプに変更する","Classic Load BalancerをApplication Load Balancerに変更する"],answers:[1,2],multi:true,explanation:"リバースプロキシとWebサーバー両方にAuto Scalingを追加することで負荷に応じた自動スケールアウト/インが可能となり、最もスケーラブルで費用対効果が高い方法です。"},
+{id:37,category:"データベース",text:"週末のトラフィック急増に備えRDSを過負荷にせずコストを最小限に抑えるAurora使用のキャンペーンサイト設計はどれですか。",options:["EC2でAuto Scalingグループを設定する","Amazon DynamoDB Accelerator（DAX）を設定しDBキャッシュを行う","Amazon DynamoDBを設定しトラフィック急増に対応する","RDSデータベースインスタンスでAuto Scalingを設定する","あらかじめ複数のRDSデータベースインスタンスを構成する"],answers:[3],multi:false,explanation:"Amazon Aurora（RDS）のAuto Scalingでリソース使用状況に応じてインスタンスを自動増減できます。DynamoDB DAXはDynamoDB向けのキャッシュでAurora向けではありません。"},
+{id:38,category:"ストレージ",text:"Windows共有ファイルストレージが必要なMicrosoft SharePointをAWSへ移行し、高可用性とActive Directory統合が必要な場合の適切な対応はどれですか。",options:["Amazon EFSストレージを利用し認証用のActive Directoryドメインを設定する","2つのAZにSMBファイル共有可能なAWS Storage Gatewayのファイルゲートウェイを作成する","Amazon S3バケットを作成しWindows ServerのボリュームとしてマウントするAWS上にファイルサーバーとしてAmazon FSx for Windowsを作成し認証用にActive Directoryドメインを設定する","AWS上にファイルサーバーとしてAmazon FSx for Windowsを作成し認証用にActive Directoryドメインを設定する"],answers:[3],multi:false,explanation:"FSx for WindowsはオンプレミスのActive DirectoryやAWS Managed Microsoft ADと統合したアクセス制御が可能で、SMBプロトコル対応の高可用な完全マネージド型ファイルストレージです。"},
+{id:39,category:"セキュリティ",text:"新しいAWSアカウントのルートユーザーへのセキュリティ対策として適切なものはどれですか（2つ選択）。",options:["ルートユーザーに多要素認証（MFA）を有効化する","ルートユーザーのアクセスキーIDとシークレットアクセスキーを暗号化しローカルに保管する","ルートユーザーのパスワードを複雑なものに変更する","ルートユーザーに対してIP制限をかける","ルートユーザーから管理者権限を取り除く"],answers:[0,2],multi:true,explanation:"MFAの有効化と複雑なパスワードへの変更が基本的かつ最も効果的なルートユーザー保護対策です。アクセスキーはローカル保管すべきでなく、IP制限はルートへの適用が困難、管理者権限の除去は不可能です。"},
+{id:40,category:"アーキテクチャ",text:"コンテナ化されたWebアプリとPostgreSQLのオンプレミス環境で、インフラメンテナンスコストとキャパシティ計画の問題を解決するには？",options:["PostgreSQLデータベースをAmazon Auroraに移行する","WebアプリケーションをEC2インスタンスでホストする","WebアプリケーションのコンテンツをAmazon CloudFrontを利用して配信する","WebアプリケーションとPostgreSQLの間にAmazon ElastiCacheを配置する"],answers:[0],multi:false,explanation:"AuroraはPostgreSQL互換のマネージドサービスで、パッチ適用・バックアップなどの運用負荷を削減できます。ストレージ自動拡張とリードレプリカのAuto Scalingでキャパシティ問題も解決します。"},
+{id:41,category:"セキュリティ",text:"S3に保存するデータの暗号化・暗号化鍵の自動ローテーション・証跡管理・権限管理が求められる場合の適切な対応はどれですか。",options:["AWS KMSで暗号化鍵を管理しSSE-KMSを使用するS3バケットを作成する","SSE-S3でS3バケットを作成しバージョニング機能を有効化する","SSE-S3でS3バケットを作成する","会社が発行・管理する暗号化鍵でSSE-Cを使用するS3バケットを作成する"],answers:[0],multi:false,explanation:"AWS KMSは暗号化鍵の自動ローテーション、使用状況の証跡管理（CloudTrail連携）、鍵の権限管理が可能です。SSE-S3ではキーの証跡管理や権限管理ができません。"},
+{id:42,category:"高可用性",text:"複数のLinuxインスタンスがEBSにデータを保存するシステムで、障害時の回復力とACID準拠ストレージを提供する最適なソリューションはどれですか。",options:["各AZのEC2でアプリケーションを起動しEBSを各EC2に接続する","複数AZにAuto Scalingグループ・ALBを作成し各EC2でインスタンスストアをマウントする","複数AZにAuto Scalingグループ・ALBを作成しAmazon EFSにデータを格納し各EC2にマウントする","複数AZにAuto Scalingグループ・ALBを作成しS3の1ゾーン低頻度アクセスでデータを保存する"],answers:[2],multi:false,explanation:"EFSは高可用で強い一貫性を持つNFSストレージです。複数のEC2インスタンスからマウントでき、ACID準拠の要件に適しています。EBSはAZをまたいで共有できず、インスタンスストアは揮発性です。"},
+{id:43,category:"ネットワーク",text:"通常時はus-east-1で動作し、障害発生時のみus-east-2に自動切り替えするルーティングポリシーはどれですか。",options:["us-east-1とus-east-2で加重ルーティングを100:0で設定する","us-east-1とus-east-2で加重ルーティングを50:50で設定する","us-east-1をプライマリ、us-east-2をセカンダリとするフェイルオーバールーティングを設定する","us-east-2をプライマリ、us-east-1をセカンダリとするフェイルオーバールーティングを設定する"],answers:[2],multi:false,explanation:"フェイルオーバールーティングはプライマリ障害時にセカンダリへ自動切り替えします。加重ルーティング100:0では障害時の自動切り替えは手動操作が必要です。"},
+{id:44,category:"セキュリティ",text:"モバイルアプリからS3へデータをアップロードする際、Webサーバーを中継せずコスト効率的な方法はどれですか。",options:["Amazon S3のクロスリージョンレプリケーション機能を利用する","S3の一時的な別バケットにアップロードしLambdaで適切なバケットにコピーする","大量トラフィックを処理できるようWebサーバーのインスタンスサイズを増やす","Amazon S3の署名付きURLを発行しモバイルアプリからデータを直接アップロードする"],answers:[3],multi:false,explanation:"S3署名付きURLを使うことでWebサーバーを経由せずモバイルアプリから直接S3にアップロードでき、トラフィックとコストを最小化できます。"},
+{id:45,category:"セキュリティ",text:"EC2からDynamoDBのusersテーブルのレコード削除のみを許可する最小権限のIAMポリシーはどれですか。",options:['Action: "dynamodb:DeleteItem", Resource: "table/*"（全テーブル）','Action: "dynamodb:DeleteItem", Resource: "table/users"（usersテーブルのみ）','Action: "dynamodb:*", Resource: "table/*"（全テーブル全権限）','Action: "dynamodb:*", Resource: "table/users"（usersテーブル全権限）'],answers:[1],multi:false,explanation:"最小権限の原則：必要なアクション（DeleteItem）のみ、必要なリソース（usersテーブル）のみを許可します。ワイルドカード（*）の使用は過剰な権限付与になります。"},
+{id:46,category:"移行",text:"100TBのファイルサーバーをS3 Glacierにバックアップする際、社内ネットワーク負担軽減とコスト効果の高い移行方法はどれですか。",options:["S3へインターネット経由でアップロードしGlacierにアーカイブするライフサイクルポリシーを設定する","サイト間VPN経由でGlacierに直接ファイルをアップロードする","サイト間VPN経由でS3にアップロードしGlacierにアーカイブするライフサイクルポリシーを設定する","AWS Snowballを使用しS3バケットに移行後Glacierにアーカイブするライフサイクルポリシーを設定する"],answers:[3],multi:false,explanation:"100TBの大容量データはAWS Snowballで物理移送し社内ネットワーク負担を軽減します。S3に保存後、ライフサイクルポリシーでGlacierへアーカイブします。インターネット/VPN経由は帯域負担大です。"},
+{id:47,category:"ストレージ",text:"古いニュース映像のビデオアーカイブで復元頻度は低いが5分以内に使用できる必要がある最も費用対効果の高いソリューションはどれですか。",options:["S3 GlacierにExpeditedオプションで保存する","S3 GlacierにStandardオプションで保存する","S3の標準低頻度アクセス（Standard-IA）で保存する","S3の1ゾーン低頻度アクセス（One Zone-IA）で保存する"],answers:[0],multi:false,explanation:"S3 Glacier ExpeditedオプションはS3より安価で1〜5分以内にデータを取り出せます。Standardオプションは3〜5時間かかるため要件を満たしません。S3 Iは低頻度の場合よりコストがかかります。"},
+{id:48,category:"コスト最適化",text:"DEV環境（営業時間10時間稼働）とPROD環境（24時間稼働）で最もコスト効果の高いインスタンス購入戦略はどれですか。",options:["DEV環境にスポットインスタンス、PROD環境にオンデマンドインスタンスを使用する","DEV環境にオンデマンドインスタンス、PROD環境にスポットインスタンスを使用する","DEV環境にスケジュールされたリザーブドインスタンス、PROD環境にリザーブドインスタンスを使用する","DEV環境にオンデマンドインスタンス、PROD環境にスケジュールされたリザーブドインスタンスを使用する"],answers:[2],multi:false,explanation:"DEV環境は決まった時間のみ起動するためスケジュールされたリザーブドインスタンス、PROD環境は24時間稼働のためリザーブドインスタンスが費用対効果最高です。"},
+{id:49,category:"高可用性",text:"メインのWebサイトがダウンした場合にユーザーがアクセスできるバックアップサイトを構築する最適なソリューションはどれですか。",options:["バックアップサイトにS3のWebサイトホスティングを利用しRoute 53のフェイルオーバールーティングを設定する","バックアップサイトにS3のWebサイトホスティングを利用しRoute 53のレイテンシールーティングを設定する","アプリケーションを別リージョンにデプロイしELBのヘルスチェックを使用してフェイルオーバーを行う","アプリケーションを別リージョンにデプロイしメインサイトのサーバーサイドでリダイレクトを設定する"],answers:[0],multi:false,explanation:"S3 Webサイトホスティング+Route 53フェイルオーバールーティングでメインサイト障害検知時に自動でバックアップサイトへ切り替えられます。ELBはリージョン間の冗長化はできません。"},
+{id:50,category:"セキュリティ",text:"米国からアクセスしているユーザーにだけ画像を配信する適切な方法はどれですか。",options:["NATインスタンスでIPアドレスを制限する","セキュリティグループを利用する","Amazon S3に画像ファイルを格納しバケットポリシーを設定する","Amazon CloudFrontの地域制限配信を利用する","Amazon API Gatewayを利用する"],answers:[3],multi:false,explanation:"CloudFrontの地域制限（地理的ブロッキング）機能で特定地域のユーザーのみにコンテンツを配信できます。セキュリティグループはIPアドレス単位での国別制限が困難です。"},
+{id:51,category:"セキュリティ",text:"CloudFront+ALB+EC2構成で特定のIPアドレスからの悪意ある攻撃をブロックする最適なソリューションはどれですか。",options:["ALB配下のEC2のセキュリティグループで特定のIPアドレスからのアクセスをブロックする","AWS WAFをCloudFrontに設定しWAFのIPアドレスマッチ条件で特定のIPアドレスをブロックする","ALB配下のEC2のネットワークACLで特定のIPアドレスからのアクセスをブロックする","Amazon CloudFrontの設定で特定のIPアドレスからのアクセスをブロックする"],answers:[1],multi:false,explanation:"AWS WAFをCloudFrontに設定しIPアドレスマッチ条件を使うことで、インターネットからの入り口でブロックできます。CloudFront自体にはIPブロック機能なく、セキュリティグループやネットワークACLはCloudFront経由のリクエストには対応できません。"},
+{id:52,category:"セキュリティ",text:"Auto Scalingの同一サブネットでアプリAからアプリBへの通信は許可しBからAへの通信を拒否するには（2つ選択）。",options:["アプリAのセキュリティグループでアプリBのIPアドレスからのインバウンド通信設定を行わない","アプリAのセキュリティグループでアプリBのIPアドレスからのインバウンド通信を拒否する","アプリBのセキュリティグループでアプリAのIPアドレス以外のアウトバウンド通信を許可する","サブネットに設定されたネットワークACLでアプリAのIPアドレスからのインバウンド通信を許可する","サブネットに設定されたネットワークACLでアプリBのIPアドレスのインバウンド通信を拒否する"],answers:[0,2],multi:true,explanation:"SGのインバウンドは指定しなければ通信を許可しません（AはBからのインバウンドを設定しない）。BのSGでAのIPアドレス以外のアウトバウンドを許可することでAへの通信のみを制限できます。同一サブネットではネットワークACLは効果がありません。"},
+{id:53,category:"ストレージ",text:"レガシーサーバーで独自のファイルシステムを使用したアプリケーションをAWSに移行する際に使用すべきストレージサービスはどれですか。",options:["Amazon EBS","Amazon EFS","Amazon S3","Amazon S3 Glacier","Amazon DynamoDB"],answers:[0],multi:false,explanation:"Amazon EBSは永続ブロックストレージでEC2にアタッチして使用します。EC2にホストされるOSからどのようなファイルシステムでも作成可能で、レガシーシステムの独自ファイルシステム移行に最適です。"},
+{id:54,category:"データベース",text:"工場のIoTデータをリアルタイム収集しスループット問題を解決するインメモリDBで可用性が高いソリューションはどれですか。",options:["Amazon RDS for PostgreSQL","Amazon Aurora","Amazon ElastiCache for Redis","Amazon ElastiCache for Memcached"],answers:[2],multi:false,explanation:"ElastiCache for Redisはインメモリデータベースで高スループットを実現します。プライマリ・スタンバイ型構成で高可用性を確保でき、データ永続性もあるためIoTデータ保存に適しています。Memcachedは高可用性やデータ永続性が担保できません。"},
+{id:55,category:"データベース",text:"Amazon DynamoDB Accelerator（DAX）の説明として適切な項目はどれですか（2つ選択）。",options:["DynamoDBよりパフォーマンスは劣るがコスト効率の良いNoSQL型データベース","S3の半構造データをDynamoDBに読み込みS3内のデータを扱えるサービス","Amazon DynamoDBのインメモリキャッシュサービス","1秒あたり100万回単位のリクエスト処理でも数ミリ秒のレイテンシーを実現できる","DynamoDBのスケーリングルールを設定できる機能"],answers:[2,3],multi:true,explanation:"DAXはDynamoDB用フルマネージドインメモリキャッシュで、1秒あたり100万リクエストでも数ミリ秒のレイテンシーを実現します。DynamoDBの読み込みスループット向上に効果的です。"},
+{id:56,category:"セキュリティ",text:"AWS Organizations内の全AWSアカウントで特定サービスへのアクセスを一括制限する単一のスケーラブルな方法はどれですか。",options:["ACLを作成しサービスまたはアクションへのアクセスを制限する","アカウントを許可するセキュリティグループを作成しユーザーグループにアタッチする","各アカウントにクロスアカウントロールを作成してアクセスを拒否する","ルート組織単位でサービスコントロールポリシーを作成する"],answers:[3],multi:false,explanation:"AWS Organizationsのサービスコントロールポリシー（SCP）をルートOUに適用することで、全アカウントのアクセスを一括制御できます。クロスアカウントロールはアカウントごとの設定が必要でスケーラブルではありません。"},
+{id:57,category:"セキュリティ",text:"AWSをセキュアに利用するためのサービスや利用方法に関する説明として誤っている項目はどれですか。",options:["S3に保存済みのオブジェクトをAWS KMSのキーを利用して暗号化することができる","AWS KMSでは作成した鍵の管理は可能だが鍵の無効化や削除はできない","AWS CloudHSMはAWSのデータセンター内に配置されるユーザー占有のハードウェアアプライアンス","AWS CloudHSMはセキュリティコンプライアンス要件が厳しい場合に適用する"],answers:[1],multi:false,explanation:"AWS KMSは鍵の作成・管理だけでなく、有効化・無効化・削除・ローテーションも可能です。「無効化や削除はできない」という説明は誤りです。"},
+{id:58,category:"ストレージ",text:"前月分の出勤管理簿データに頻繁アクセス・それ以前はまれにアクセス・即時取得可能・S3コスト削減の費用対効果が高い方法はどれですか。",options:["過去データを定期的にS3 Glacierに手動アーカイブする","S3ライフサイクルルールで前月より過去のデータをStandard-IAに移行する","S3ライフサイクルルールで前月より過去のデータをOne Zone-IAに移行する","出勤管理簿データをバイナリ変換してAmazon RDSに保存する"],answers:[1],multi:false,explanation:"Standard-IAはスタンダードと同等の耐久性があり、アクセス頻度が低いデータを低コストで即時取得可能です。One Zone-IAは耐久性が低く、Glacierは即時取得できません。"},
+{id:59,category:"セキュリティ",text:"WebアプリサーバーへHTTPS接続を許可しDBサーバーはWebアプリサーバーからの接続のみ受け付けるセキュリティ設定はどれですか（2つ選択）。",options:["ネットワークACLでWebアプリサーバーのサブネットにHTTPS接続のインバウンドをすべて許可・アウトバウンドをすべて拒否する","セキュリティグループでDBサーバーの接続ポートを開放しWebアプリサーバーのSGからの接続のみ許可する","DBサーバーをWebアプリサーバーと同じサブネットに再配置する","ネットワークACLでプライベートサブネットのDBポートへのインバウンドをすべて許可・アウトバウンドをすべて拒否する","セキュリティグループでWebアプリサーバーのHTTPSポートを開放しインターネット（0.0.0.0/0）からの接続を許可する"],answers:[1,4],multi:true,explanation:"DBサーバーのSGでWebアプリサーバーのSGからの接続のみ許可し、WebアプリサーバーのSGでHTTPSポートをインターネットから許可することで要件を満たします。ネットワークACLはステートレスでアウトバウンドを全拒否すると戻り通信ができなくなります。"},
+{id:60,category:"データベース",text:"削除したデータが表示されてしまうDynamoDB使用アプリケーションの問題を解決する方法はどれですか。",options:["Amazon DynamoDBグローバルテーブルを利用する","Amazon DynamoDBストリームを利用する","キャパシティモードはオンデマンドを選択する","Consistent Readの設定を有効にする"],answers:[3],multi:false,explanation:"DynamoDBは結果整合性モデルのため書き込み直後のデータが反映されない場合があります。Consistent Read（読み取り一貫性）を有効にすることで常に最新データを取得できます。"},
+{id:61,category:"ネットワーク",text:"プライベートサブネットのEC2インスタンスからインターネットへのIPv6トラフィックを確立し自動スケール・追加費用なしの要件を満たすサービスはどれですか。",options:["Egress-Onlyインターネットゲートウェイ","NATゲートウェイ","カスタムNATインスタンス","VPCエンドポイント"],answers:[0],multi:false,explanation:"Egress-Onlyインターネットゲートウェイは冗長化されており、IPv6を使用してVPCからインターネットへの送信専用接続を可能にします。NATゲートウェイは利用時間課金、カスタムNATインスタンスは自動スケール不可です。"},
+{id:62,category:"ネットワーク",text:"プライベートサブネットのEC2インスタンスからインターネット経由なしでAmazon S3を利用する適切な方法はどれですか。",options:["EC2インスタンス用のVPCエンドポイントを作成しルートテーブルにS3のターゲットを設定する","EC2インスタンス用のVPCエンドポイントインターフェイスを作成する","Amazon S3用のVPCエンドポイントを作成しルートテーブルにS3のターゲットを設定する","Amazon S3用のVPCエンドポイントインターフェイスを作成する"],answers:[2],multi:false,explanation:"S3へのプライベート接続にはゲートウェイ型VPCエンドポイントを作成し、ルートテーブルにS3のターゲットを設定します。S3はゲートウェイ型、EC2はインターフェイス型のVPCエンドポイントが提供されています。"},
+{id:63,category:"コンピューティング",text:"毎分5件から毎分5000件以上へのトラフィック急増に確実に対応するNode.jsアプリケーションの方法はどれですか。",options:["AWS Lambda","Amazon ElastiCache","想定の負荷を処理できる数のEC2インスタンスを用意する","Auto Scalingグループを作成しEC2インスタンスをスケールアウトする"],answers:[3],multi:false,explanation:"Auto ScalingでEC2インスタンスを自動スケールアウトすることで急激なトラフィック増加に確実に対応できます。Lambdaはコールドスタートで急増対応が困難、ElastiCacheはNode.jsアプリ実行不可です。"},
+{id:64,category:"ストレージ",text:"チームごとに独立したディレクトリを持ちユーザーは自分のチームのファイルのみアクセスできる共有ファイルシステムの設計方針はどれですか。",options:["Amazon EFSを利用しファイル単位でアクセス制御を行う","Amazon S3を利用しACLによるアクセス制御を行う","Amazon S3を利用しIAMによるアクセス制御を行う","Amazon EFSを利用しセキュリティグループによるアクセス制御を行う"],answers:[0],multi:false,explanation:"EFSはEC2インスタンスにマウントして利用するためOS機能によるファイル単位のアクセス制御が可能です。S3のACLはAWSアカウント単位、IAMはAPIコールが対象でディレクトリ単位のアクセス制御には不向きです。"},
+{id:65,category:"分析",text:"Redshiftのクエリ数が多くなった場合に処理数に応じて自動スケールして処理できるようにするソリューションはどれですか。",options:["処理待ちのクエリをSQSに格納する","クロスリージョンスナップショットを利用する","ノード数を増やす","Redshift concurrency scalingを有効にする"],answers:[3],multi:false,explanation:"Redshift concurrency scalingを有効にするとバースト性のあるユースケースで自動スケーリングしクエリを処理します。SQSはキューに格納するだけで高速化できず、クロスリージョンスナップショットはバックアップ用です。"}
+];
+
+const CATEGORIES = [...new Set(QUESTIONS.map(q=>q.category))];
+
+let state = {
+  tab: 'home',
+  mode: 'all',
+  quizQuestions: [],
+  qIndex: 0,
+  selected: [],
+  confirmed: false,
+  sessionResults: [],
+  history: {},
+  loading: true
+};
+
+async function loadHistory(){
+  try {
+    const r = await window.storage.get('quiz_history');
+    if(r) state.history = JSON.parse(r.value);
+  } catch(e){ state.history = {}; }
+  state.loading = false;
+  render();
+}
+
+async function saveHistory(){
+  try {
+    await window.storage.set('quiz_history', JSON.stringify(state.history));
+  } catch(e){}
+}
+
+function showTab(tab){
+  state.tab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
+  if(tab!=='quiz') state.quizQuestions=[];
+  render();
+}
+
+function getWeakCategories(){
+  const cats = {};
+  CATEGORIES.forEach(c=>{cats[c]={total:0,wrong:0}});
+  Object.values(state.history).forEach(r=>{
+    const q = QUESTIONS.find(q=>q.id===r.id);
+    if(!q) return;
+    if(!cats[q.category]) cats[q.category]={total:0,wrong:0};
+    cats[q.category].total++;
+    if(!r.correct) cats[q.category].wrong++;
+  });
+  return Object.entries(cats)
+    .filter(([,v])=>v.total>0)
+    .map(([cat,v])=>({cat,total:v.total,wrong:v.wrong,rate:v.wrong/v.total}))
+    .sort((a,b)=>b.rate-a.rate);
+}
+
+function getStats(){
+  const hs = Object.values(state.history);
+  const total = hs.length;
+  const correct = hs.filter(r=>r.correct).length;
+  const wrong = total - correct;
+  const notDone = QUESTIONS.length - total;
+  return {total, correct, wrong, notDone};
+}
+
+function startQuiz(mode){
+  let qs = [...QUESTIONS];
+  if(mode==='weak'){
+    const weak = getWeakCategories().filter(w=>w.rate>0).map(w=>w.cat);
+    qs = qs.filter(q=>weak.includes(q.category));
+    if(qs.length===0){alert('苦手問題がありません。全問題でスタートします。');qs=[...QUESTIONS];}
+  } else if(mode==='unanswered'){
+    qs = qs.filter(q=>!state.history[q.id]);
+    if(qs.length===0){alert('未回答問題がありません。全問題でスタートします。');qs=[...QUESTIONS];}
+  } else if(mode==='random'){
+    qs = qs.sort(()=>Math.random()-.5).slice(0,20);
+  }
+  qs = qs.sort(()=>Math.random()-.5);
+  state.quizQuestions = qs;
+  state.qIndex = 0;
+  state.selected = [];
+  state.confirmed = false;
+  state.sessionResults = [];
+  state.tab = 'quiz';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-quiz')?.classList.add('active');
+  render();
+}
+
+function selectOption(idx){
+  if(state.confirmed) return;
+  const q = state.quizQuestions[state.qIndex];
+  if(q.multi){
+    const i = state.selected.indexOf(idx);
+    if(i>=0) state.selected.splice(i,1);
+    else state.selected.push(idx);
+  } else {
+    state.selected = [idx];
+  }
+  render();
+}
+
+function confirm(){
+  if(state.selected.length===0) return;
+  state.confirmed = true;
+  const q = state.quizQuestions[state.qIndex];
+  const correct = q.answers.length === state.selected.length && q.answers.every(a=>state.selected.includes(a));
+  state.sessionResults.push({id:q.id, correct});
+  state.history[q.id] = {id:q.id, correct, ts: Date.now()};
+  saveHistory();
+  render();
+}
+
+function nextQuestion(){
+  state.qIndex++;
+  state.selected = [];
+  state.confirmed = false;
+  if(state.qIndex >= state.quizQuestions.length){
+    state.tab = 'result';
+  }
+  render();
+}
+
+function resetHistory(){
+  if(!confirm('全ての進捗をリセットしますか？')) return;
+  state.history = {};
+  saveHistory();
+  render();
+}
+
+function render(){
+  const root = document.getElementById('root');
+  const hc = document.getElementById('header-count');
+  const done = Object.keys(state.history).length;
+  hc.textContent = done+'/65問';
+
+  if(state.loading){
+    root.innerHTML = '<div class="spinner"><i class="ti ti-refresh" style="font-size:24px"></i><br>読み込み中…</div>';
+    return;
+  }
+
+  if(state.tab==='home') renderHome(root);
+  else if(state.tab==='quiz') renderQuiz(root);
+  else if(state.tab==='result') renderResult(root);
+  else if(state.tab==='history') renderHistory(root);
+  else if(state.tab==='settings') renderSettings(root);
+}
+
+function renderHome(root){
+  const s = getStats();
+  const pct = QUESTIONS.length>0 ? Math.round(s.total/QUESTIONS.length*100) : 0;
+  const accPct = s.total>0 ? Math.round(s.correct/s.total*100) : 0;
+  root.innerHTML = `
+  <div class="screen">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num orange">${pct}%</div><div class="stat-lbl">進捗率</div></div>
+      <div class="stat-card"><div class="stat-num green">${accPct}%</div><div class="stat-lbl">正答率</div></div>
+      <div class="stat-card"><div class="stat-num">${s.total}</div><div class="stat-lbl">回答済み</div></div>
+      <div class="stat-card"><div class="stat-num">${s.notDone}</div><div class="stat-lbl">未回答</div></div>
+    </div>
+    <div style="background:var(--bg2);border-radius:8px;height:6px;margin-bottom:16px">
+      <div style="background:var(--aws-orange);height:6px;border-radius:8px;width:${pct}%;transition:width .5s"></div>
+    </div>
+
+    <div class="section-title">学習モードを選択</div>
+    <div class="mode-btns">
+      <div class="mode-btn ${state.mode==='all'?'active':''}" onclick="state.mode='all';render()">
+        <div class="mode-icon">📚</div>
+        <div class="mode-name">全問題</div>
+        <div class="mode-desc">65問すべて</div>
+      </div>
+      <div class="mode-btn ${state.mode==='random'?'active':''}" onclick="state.mode='random';render()">
+        <div class="mode-icon">🎲</div>
+        <div class="mode-name">ランダム</div>
+        <div class="mode-desc">20問をランダム</div>
+      </div>
+      <div class="mode-btn ${state.mode==='unanswered'?'active':''}" onclick="state.mode='unanswered';render()">
+        <div class="mode-icon">🆕</div>
+        <div class="mode-name">未回答</div>
+        <div class="mode-desc">未挑戦の問題</div>
+      </div>
+      <div class="mode-btn ${state.mode==='weak'?'active':''}" onclick="state.mode='weak';render()">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-name">苦手問題</div>
+        <div class="mode-desc">誤答率が高い分野</div>
+      </div>
+    </div>
+    <button class="start-btn" onclick="startQuiz(state.mode)">学習スタート →</button>
+  </div>`;
+}
+
+function renderQuiz(root){
+  if(state.quizQuestions.length===0){renderHome(root);return;}
+  const q = state.quizQuestions[state.qIndex];
+  const total = state.quizQuestions.length;
+  const pct = Math.round((state.qIndex)/total*100);
+
+  let optionsHTML = q.options.map((opt,i)=>{
+    let cls = 'option';
+    if(state.confirmed){
+      cls += ' disabled';
+      if(q.answers.includes(i)) cls += ' correct';
+      else if(state.selected.includes(i)) cls += ' wrong';
+    } else {
+      if(state.selected.includes(i)) cls += ' selected';
+    }
+    const letter = String.fromCharCode(65+i);
+    return `<div class="${cls}" onclick="selectOption(${i})">
+      <div class="option-letter">${letter}</div>
+      <div class="option-text">${opt}</div>
+    </div>`;
+  }).join('');
+
+  const isCorrect = state.confirmed && q.answers.length===state.selected.length && q.answers.every(a=>state.selected.includes(a));
+  const explHTML = state.confirmed ? `
+    <div class="explanation">
+      <h4>${isCorrect?'✓ 正解！':'✗ 不正解'}</h4>
+      <p>${q.explanation}</p>
+    </div>` : '';
+
+  const multiHint = q.multi ? `<div class="multi-hint">※ 複数選択（${q.answers.length}つ）</div>` : '';
+
+  let actionBtn = '';
+  if(!state.confirmed){
+    const canConfirm = state.selected.length>0 && (!q.multi || state.selected.length===q.answers.length);
+    actionBtn = `<button class="confirm-btn ${canConfirm?'active':'inactive'}" onclick="${canConfirm?'confirm()':''}">
+      ${q.multi?`回答する（${state.selected.length}/${q.answers.length}選択）`:'回答する'}
+    </button>`;
+  } else {
+    const isLast = state.qIndex>=state.quizQuestions.length-1;
+    actionBtn = `<button class="nav-btn primary" onclick="nextQuestion()">${isLast?'結果を見る →':'次の問題 →'}</button>`;
+  }
+
+  root.innerHTML = `
+  <div style="background:var(--bg2);height:3px">
+    <div style="background:var(--aws-orange);height:3px;width:${pct}%;transition:width .3s"></div>
+  </div>
+  <div class="screen">
+    <div class="q-header">
+      <div class="q-num">問 ${state.qIndex+1} / ${total}</div>
+      <div class="q-badge">${q.category}</div>
+    </div>
+    <div class="question-card">
+      <div class="question-text">${q.text}</div>
+      ${multiHint}
+    </div>
+    <div class="options">${optionsHTML}</div>
+    ${explHTML}
+    ${actionBtn}
+  </div>`;
+}
+
+function renderResult(root){
+  const total = state.sessionResults.length;
+  const correct = state.sessionResults.filter(r=>r.correct).length;
+  const pct = Math.round(correct/total*100);
+  let msg = pct>=80?'素晴らしい！試験合格レベルです 🎉':pct>=60?'もう少し！苦手分野を復習しましょう 💪':'基礎をしっかり固めましょう 📚';
+  root.innerHTML = `
+  <div class="screen">
+    <div class="result-header">
+      <div class="result-icon">${pct>=80?'🏆':pct>=60?'📈':'📚'}</div>
+      <div class="result-score">${correct}<span style="font-size:20px;color:var(--text2)"> / ${total}</span></div>
+      <div class="result-total">正答率 ${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-num green">${correct}</div><div class="stat-lbl">正解</div></div>
+      <div class="stat-card"><div class="stat-num red">${total-correct}</div><div class="stat-lbl">不正解</div></div>
+    </div>
+    <button class="start-btn" onclick="state.tab='home';showTab('home')">ホームに戻る</button>
+    <button class="nav-btn" style="width:100%;margin-top:10px" onclick="startQuiz(state.mode)">もう一度挑戦 →</button>
+  </div>`;
+}
+
+function renderHistory(root){
+  const weak = getWeakCategories();
+  const s = getStats();
+  const accPct = s.total>0 ? Math.round(s.correct/s.total*100) : 0;
+
+  const catHTML = CATEGORIES.map(cat=>{
+    const qs = QUESTIONS.filter(q=>q.category===cat);
+    const done = qs.filter(q=>state.history[q.id]).length;
+    const correct = qs.filter(q=>state.history[q.id]?.correct).length;
+    const pct = done>0?Math.round(correct/done*100):null;
+    return `<div class="weak-item">
+      <div class="weak-info">
+        <div class="weak-name">${cat}</div>
+        <div style="font-size:11px;color:var(--text2)">${done}/${qs.length}問回答 ${pct!==null?'• 正答率'+pct+'%':''}</div>
+        <div class="weak-bar-wrap"><div class="weak-bar" style="width:${done/qs.length*100}%;background:${pct===null?'var(--aws-orange)':pct>=70?'var(--correct)':'var(--wrong)'}"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const weakTop = weak.filter(w=>w.rate>0).slice(0,3);
+  const weakHTML = weakTop.length===0 ? '<div class="empty">まだ回答データがありません</div>' :
+    weakTop.map(w=>`<div class="weak-item">
+      <div class="weak-info">
+        <div class="weak-name">⚠ ${w.cat}</div>
+        <div class="weak-rate">誤答率 ${Math.round(w.rate*100)}%（${w.wrong}/${w.total}問）</div>
+        <div class="weak-bar-wrap"><div class="weak-bar" style="width:${w.rate*100}%"></div></div>
+      </div>
+    </div>`).join('');
+
+  root.innerHTML = `
+  <div class="screen">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num orange">${accPct}%</div><div class="stat-lbl">総合正答率</div></div>
+      <div class="stat-card"><div class="stat-num">${s.total}</div><div class="stat-lbl">回答済み</div></div>
+    </div>
+    <div class="section-title">苦手分野 TOP3</div>
+    <div class="weak-list">${weakHTML}</div>
+    <div class="section-title">カテゴリ別進捗</div>
+    <div class="weak-list">${catHTML}</div>
+  </div>`;
+}
+
+function renderSettings(root){
+  root.innerHTML = `
+  <div class="screen">
+    <div class="section-title">データ管理</div>
+    <div style="background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="font-size:14px;color:var(--text);margin-bottom:4px">回答履歴</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">${Object.keys(state.history).length}問の回答データが保存されています</div>
+      <button class="nav-btn" style="width:100%;color:var(--wrong);border-color:var(--wrong)" onclick="resetHistory()">履歴をリセット</button>
+    </div>
+    <div class="section-title">試験情報</div>
+    <div style="background:var(--bg2);border-radius:12px;padding:16px">
+      <div style="font-size:13px;color:var(--text);line-height:1.8">
+        <div>🏷 試験番号: SAA-C03</div>
+        <div>📝 問題数: 65問</div>
+        <div>⏱ 試験時間: 130分</div>
+        <div>✅ 合格スコア: 約720/1000点</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text2)">進捗データはデバイスに保存されます</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+loadHistory();
+</script>
